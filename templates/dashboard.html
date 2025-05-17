@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password Manager Dashboard</title>
+    <link rel="stylesheet" href="/psm/static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/psm/static/icons/bootstrap-icons.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+        .dashboard-container {
+            max-width: 98%;
+            width: 98%;
+            margin: 20px auto;
+            padding: 2.5rem 2.5rem 2.5rem 2.5rem;
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 8px 32px 0 rgba(37, 150, 190, 0.10);
+            border: 1.5px solid #e3eaf1;
+        }
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .dashboard-header h3 {
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: #2596be;
+            margin-bottom: 0;
+        }
+        .admin-panel-btn {
+            background-color: #2596be;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            padding: 0.5rem 1.2rem;
+            box-shadow: 0 2px 8px 0 rgba(37,150,190,0.10);
+            outline: none;
+        }
+        .admin-panel-btn:focus,
+        .admin-panel-btn:active {
+            background-color: #2596be !important;
+            color: #fff !important;
+            box-shadow: 0 2px 8px 0 rgba(37,150,190,0.10) !important;
+            outline: none !important;
+        }
+        .admin-panel-btn:hover {
+            background-color: #2596be !important;
+            color: #fff !important;
+        }
+        .form-label {
+            color: #2596be;
+            font-weight: 500;
+        }
+        .form-control, .form-select, textarea {
+            border-radius: 12px;
+            border: 1px solid #ced4da;
+            background: #f8f9fa;
+            color: #222;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .form-control:focus, .form-select:focus, textarea:focus {
+            border-color: #2596be;
+            box-shadow: 0 0 0 0.2rem rgba(37,150,190,0.10);
+            background: #fff;
+            color: #222;
+        }
+        .btn-primary {
+            background-color: #2596be;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: box-shadow 0.2s, transform 0.2s;
+            box-shadow: 0 2px 8px 0 rgba(37,150,190,0.10);
+        }
+        .btn-primary:hover {
+            background-color: #2286aa;
+            box-shadow: 0 4px 16px 0 rgba(37,150,190,0.18);
+            transform: translateY(-2px) scale(1.04);
+        }
+        .btn-warning {
+            background-color: #ffc107;
+            color: #222;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+        .btn-warning:hover {
+            background-color: #e0a800;
+            color: #222;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+        .btn-danger:hover {
+            background-color: #c32232;
+            color: #fff;
+        }
+        .table {
+            width: 100%;
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 0;
+        }
+        .table th, .table td {
+            border-color: #e3eaf1 !important;
+            vertical-align: middle;
+            text-align: center;
+        }
+        .table th {
+            background: #2596be;
+            color: #fff;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        .my-3 {
+            margin-top: 1.5rem !important;
+            margin-bottom: 1.5rem !important;
+        }
+        #dashboardError {
+            color: #dc3545;
+            font-weight: 500;
+            text-align: center;
+        }
+        @media (max-width: 900px) {
+            .dashboard-container { padding: 1.2rem 0.5rem; }
+            .table { font-size: 0.95rem; }
+        }
+        @media (max-width: 600px) {
+            .dashboard-container { padding: 0.5rem 0.2rem; }
+            .table { font-size: 0.85rem; }
+            .dashboard-header h3 { font-size: 1.2rem; }
+        }
+        .navbar-sticky {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            z-index: 1000;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .body-with-navbar {
+            padding-top: 70px; /* Adjust to navbar height */
+        }
+        .navbar-sticky {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            z-index: 1000;
+            background: #fff;
+            border-bottom: 1px solid #e0e0e0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            height: 70px;
+            display: flex;
+            align-items: center;
+        }
+        .navbar-content {
+            width: 98%;
+            max-width: 1500px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 70px;
+            padding-right: 24px;
+        }
+        .navbar-heading {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2596be;
+        }
+        .navbar-right .btn {
+            margin-left: 10px;
+        }
+        .navbar-text-btn {
+            cursor: pointer;
+            margin-left: 10px;
+            color: #2596be;
+            font-weight: 500;
+            transition: color 0.2s;
+            font-weight: bold;
+        }
+
+        .navbar-text-btn:hover {
+            color: #2286aa;
+        }
+        .navbar-text-btn.navbar-logout-text-btn:hover {
+            color: #c32232 !important;
+        }
+        /* Removed hover effect for logout/navbar-text-btn */
+        /* .navbar-text-btn:hover {
+            color: #dc3545;
+        } */
+        /* .body-with-navbar {
+            padding-top: 70px;
+        } */
+    </style>
+</head>
+<body class="body-with-navbar">
+    <nav class="navbar-sticky">
+        <div class="navbar-content">
+            <div class="navbar-left">
+                <span class="navbar-heading">Dashboard</span>
+            </div>
+            <div class="navbar-right" id="navbarRightBtns">
+                <!-- Admin Panel button will be injected here if admin -->
+            </div>
+        </div>
+    </nav>
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h3>Credentials</h3>
+            <button class="btn btn-primary" onclick="showEntryForm()" aria-label="Add New Entry" title="Add a new credential entry">Add New Entry</button>
+        </div>
+        <div id="entriesTableContainer"></div>
+        <div id="entryFormContainer" style="display:none;"></div>
+        <div id="dashboardError" class="text-danger mt-3"></div>
+    </div>
+    <div id="loadingSpinner" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(255,255,255,0.6);z-index:2000;align-items:center;justify-content:center;">
+        <div class="spinner-border" style="width:3rem;height:3rem;color:#2596be;" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+    <script src="/psm/static/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function showLoadingSpinner() {
+            document.getElementById('loadingSpinner').style.display = 'flex';
+        }
+        function hideLoadingSpinner() {
+            document.getElementById('loadingSpinner').style.display = 'none';
+        }
+
+        const token = sessionStorage.getItem('token');
+        if (!token) window.location.href = '/psm';
+
+        // Decode JWT to check for admin role
+        function parseJwt (token) {
+            try {
+                return JSON.parse(atob(token.split('.')[1]));
+            } catch (e) { return {}; }
+        }
+        const payload = parseJwt(token);
+        const navbarRightBtns = document.getElementById('navbarRightBtns');
+        if (payload.role === 'admin') {
+            navbarRightBtns.innerHTML = '<span class="navbar-text-btn" onclick="window.location.href=\'/psm/admin\'">Admin Panel</span>' +
+                '<span class="navbar-text-btn navbar-logout-text-btn" style="color:#dc3545;" onclick="logout()">Logout</span>';
+        } else {
+            navbarRightBtns.innerHTML = '<span class="navbar-text-btn navbar-logout-text-btn" style="color:#dc3545;" onclick="logout()">Logout</span>';
+        }
+
+        function logout() {
+            sessionStorage.removeItem('token');
+            window.location.href = '/psm';
+        }
+
+        let entriesPageSize = 10;
+
+        async function fetchEntries() {
+            showLoadingSpinner();
+            const res = await fetch('/psm/api/entries', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            if (res.ok) {
+                const entries = await res.json();
+                window.allEntries = entries;
+                renderEntriesTable(entries);
+            } else {
+                document.getElementById('dashboardError').innerText = 'Failed to load entries.';
+            }
+            hideLoadingSpinner();
+        }
+
+        // Store search value globally
+        window.entriesSearchValue = window.entriesSearchValue || '';
+
+        function renderEntriesTable(entries) {
+            const isAdmin = payload.role === 'admin';
+            let pageSize = window.entriesPageSize || 10;
+            if (![10, 20, 30, 40, 50].includes(pageSize)) pageSize = 10;
+            window.entriesPageSize = pageSize;
+            let currentPage = window.entriesCurrentPage || 1;
+            const totalPages = Math.ceil(entries.length / pageSize) || 1;
+            if (currentPage > totalPages) currentPage = totalPages;
+            window.entriesCurrentPage = currentPage;
+            const start = (currentPage - 1) * pageSize;
+            const end = start + pageSize;
+            const pagedEntries = entries.slice(start, end);
+            // Search bar (modern design)
+            let searchBar = `<div class="input-group mb-2" style="max-width:320px;">
+                <span class="input-group-text" style="background:#f8fafd;color:#2596be;font-weight:bold;box-shadow:none;"><i class="bi bi-search"></i></span>
+                <input id="entriesSearchInput" class="form-control" style="border-left:0;border-radius:0 12px 12px 0;background:#f8fafd;box-shadow:none;" placeholder="Search..." value="${window.entriesSearchValue || ''}" oninput="searchEntries()">
+            </div>`;
+            // Page size selector
+            let pageSizeSelector = `<div class="d-flex justify-content-end mb-2"><label class="me-2" style="color:#2596be;">Show <select id='entriesPageSizeSelect' class='form-select d-inline-block' style='width:auto;display:inline-block;height:32px;padding:2px 8px;font-size:0.95em;color:#2596be;'>`;
+            [10, 20, 30, 40, 50].forEach(size => {
+                pageSizeSelector += `<option value='${size}'${size === pageSize ? ' selected' : ''}>${size}</option>`;
+            });
+            pageSizeSelector += `</select> entries</label></div>`;
+            let html = `
+<div class="row mb-2">
+  <div class="col-12 col-md-6">${searchBar}</div>
+  <div class="col-12 col-md-6 d-flex justify-content-end align-items-center">${pageSizeSelector}</div>
+</div>
+<table class="table table-bordered">
+<thead>
+<tr>
+<th>Module</th>
+<th>IP</th>
+<th>Port</th>
+<th>URL</th>
+<th>Username</th>
+<th>Password</th>
+<th>Note</th>`;
+            if (isAdmin) html += '<th>Owner</th>';
+            html += '<th>Actions</th></tr></thead><tbody>';
+            for (const entry of pagedEntries) {
+                html += `<tr>
+                    <td>${entry.module}</td>
+                    <td>${entry.ip || ''}</td>
+                    <td>${entry.port || ''}</td>
+                    <td>${entry.url || ''}</td>
+                    <td>${entry.username || ''}</td>
+                    <td><input type="password" value="${entry.password}" readonly style="border:none; background:transparent; width:90px;" id="pw${entry.id}"> <button class="btn btn-sm btn-outline-secondary" onclick="togglePassword(${entry.id})"><i class="bi bi-eye"></i></button></td>
+                    <td>${entry.note || ''}</td>`;
+                if (isAdmin) html += `<td>${entry.created_by || ''}</td>`;
+                html += `<td style="white-space:nowrap;">
+                    <span title="Edit">
+                        <i class="bi bi-pencil-square" style="color:#2596be; font-size:1.2em; cursor:pointer; vertical-align:middle;" onclick="editEntry(${entry.id})"></i>
+                    </span>
+                    <span title="Delete" class="ms-3">
+                        <i class="bi bi-trash" style="color:#dc3545; font-size:1.2em; cursor:pointer; vertical-align:middle;" onclick="deleteEntry(${entry.id})"></i>
+                    </span>
+                </td>
+                </tr>`;
+            }
+            html += '</tbody></table>';
+            // Add blank space below the table for consistent height if not enough rows (10 rows height)
+            html += `<div id="entriesTableBlankSpace" style="width:100%;background:#f8f9fa;transition:height 0.4s cubic-bezier(.4,2,.6,1);height:${pagedEntries.length < 10 ? (10 - pagedEntries.length) * 56 : 0}px;"></div>`;
+            // Pagination controls
+            if (totalPages > 1) {
+                html += `<style>
+                    .pagination .page-link, .pagination .page-link:focus {
+                        color: #2596be;
+                        border-color: #2596be33;
+                        background: #fff;
+                      
+                    }
+                    .pagination .page-item.active .page-link {
+                        background-color: #2596be;
+                        border-color: #2596be;
+                        color: #fff;
+                    }
+                    .pagination .page-link:hover {
+                        color: #fff;
+                        background: #2596be;
+                        border-color: #2596be;
+                    }
+                </style>`;
+                html += `<nav aria-label="Page navigation"><ul class="pagination justify-content-center mt-3">`;
+                html += `<li class="page-item${currentPage === 1 ? ' disabled' : ''}"><a class="page-link" href="#" onclick="changeEntriesPage(${currentPage - 1});return false;"><</a></li>`;
+                for (let i = 1; i <= totalPages; i++) {
+                    html += `<li class="page-item${i === currentPage ? ' active' : ''}"><a class="page-link" href="#" onclick="changeEntriesPage(${i});return false;">${i}</a></li>`;
+                }
+                html += `<li class="page-item${currentPage === totalPages ? ' disabled' : ''}"><a class="page-link" href="#" onclick="changeEntriesPage(${currentPage + 1});return false;">></a></li>`;
+                html += '</ul></nav>';
+            }
+            document.getElementById('entriesTableContainer').innerHTML = html;
+            // Add event listener for page size selector
+            document.getElementById('entriesPageSizeSelect').onchange = function() {
+                window.entriesPageSize = parseInt(this.value);
+                window.entriesCurrentPage = 1;
+                fetchEntries();
+            };
+        }
+
+        function changeEntriesPage(page) {
+            window.entriesCurrentPage = page;
+            fetchEntries();
+        }
+
+        function togglePassword(id) {
+            const input = document.getElementById('pw' + id);
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+
+        function showEntryForm(entry = null) {
+            const isEdit = !!entry;
+            document.getElementById('entryFormContainer').style.display = 'block';
+            document.getElementById('entryFormContainer').innerHTML = `
+                <div class="modal fade show" id="entryModal" tabindex="-1" style="display:block;background:rgba(0,0,0,0.25);animation:fadeIn .2s;" aria-modal="true" role="dialog" aria-labelledby="entryModalLabel" aria-describedby="entryModalDesc">
+                    <div class="modal-dialog modal-lg modal-dialog-centered">
+                        <div class="modal-content" style="border-radius:16px;box-shadow:0 8px 32px 0 rgba(37,150,190,0.18);">
+                            <div class="modal-header" style="border-radius:16px 16px 0 0; border-bottom:1px solid #e3eaf1; background:#fff;">
+                                <h5 class="modal-title" id="entryModalLabel" style="color:#2596be;font-weight:700;">
+                                    <i class="bi bi-${isEdit ? 'pencil-square' : 'plus-circle'}" style="margin-right:8px;"></i>
+                                    ${isEdit ? 'Edit Entry' : 'Add New Entry'}
+                                </h5>
+                                <button type="button" class="btn-close" aria-label="Close" onclick="hideEntryForm()"></button>
+                            </div>
+                            <div class="modal-body p-4" id="entryModalDesc">
+                                <form id="entryForm" autocomplete="off">
+                                    <div class="row g-3">
+                                        <div class="col-md-6 col-12">
+                                            <label class="form-label"><i class="bi bi-box"></i> Module<span style="color:#dc3545;">*</span></label>
+                                            <input class="form-control" name="module" placeholder="e.g. Database" value="${entry ? entry.module : ''}">
+                                        </div>
+                                        <div class="col-md-6 col-12">
+                                            <label class="form-label"><i class="bi bi-globe"></i> URL</label>
+                                            <input class="form-control" name="url" placeholder="e.g. https://example.com" value="${entry ? entry.url : ''}">
+                                        </div>
+                                    </div>
+                                    <div class="row g-3 mt-1">
+                                        <div class="col-md-4 col-12">
+                                            <label class="form-label"><i class="bi bi-hdd-network"></i> IP<span style="color:#dc3545;">*</span></label>
+                                            <input class="form-control" name="ip" placeholder="e.g. 192.168.1.1" value="${entry ? entry.ip : ''}">
+                                        </div>
+                                        <div class="col-md-4 col-12">
+                                            <label class="form-label"><i class="bi bi-plug"></i> Port<span style="color:#dc3545;">*</span></label>
+                                            <input class="form-control" name="port" type="number" min="1" max="65535" placeholder="e.g. 3306" value="${entry ? entry.port : ''}">
+                                        </div>
+                                        <div class="col-md-4 col-12">
+                                            <label class="form-label"><i class="bi bi-person"></i> Username</label>
+                                            <input class="form-control" name="username" placeholder="e.g. admin" value="${entry ? entry.username : ''}">
+                                        </div>
+                                    </div>
+                                    <div class="row g-3 mt-1">
+                                        <div class="col-md-6 col-12">
+                                            <label class="form-label"><i class="bi bi-key"></i> Password<span style="color:#dc3545;">*</span></label>
+                                            <div class="input-group">
+                                                <input class="form-control" name="password" placeholder="Password" type="password" id="entryPasswordInput" value="${entry ? entry.password : ''}">
+                                                <button class="btn btn-outline-secondary" type="button" tabindex="-1" id="toggleEntryFormPasswordBtn" onclick="toggleEntryFormPassword()"><i class="bi bi-eye"></i></button>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-12">
+                                            <label class="form-label"><i class="bi bi-sticky"></i> Note</label>
+                                            <textarea class="form-control" name="note" placeholder="Optional note" rows="2">${entry ? entry.note || '' : ''}</textarea>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex justify-content-end mt-4">
+                                        <button type="button" class="btn btn-secondary me-2" onclick="hideEntryForm()">Cancel</button>
+                                        <button type="submit" class="btn btn-success" id="entryFormSubmitBtn">${isEdit ? 'Update' : 'Create'}</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <style>@keyframes fadeIn{from{opacity:0}to{opacity:1}}</style>
+            `;
+            document.body.style.overflow = 'hidden';
+            // Focus first input
+            setTimeout(() => {
+                const firstInput = document.querySelector('#entryForm input');
+                if (firstInput) firstInput.focus();
+            }, 100);
+            // Escape key closes modal
+            document.onkeydown = function(e) {
+                if (e.key === 'Escape') hideEntryForm();
+            };
+            // Password show/hide toggle with icon change
+            window.toggleEntryFormPassword = function() {
+                const input = document.getElementById('entryPasswordInput');
+                const btn = document.getElementById('toggleEntryFormPasswordBtn').firstElementChild;
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    btn.classList.remove('bi-eye');
+                    btn.classList.add('bi-eye-slash');
+                } else {
+                    input.type = 'password';
+                    btn.classList.remove('bi-eye-slash');
+                    btn.classList.add('bi-eye');
+                }
+            };
+            // Form validation and submit
+            document.getElementById('entryForm').onsubmit = async function(e) {
+                e.preventDefault();
+                showLoadingSpinner();
+                const form = e.target;
+                const data = Object.fromEntries(new FormData(form));
+                let url = '/psm/api/entry';
+                let method = 'POST';
+                if (isEdit) {
+                    url += '/' + entry.id;
+                    method = 'PUT';
+                }
+                // Disable submit button while saving
+                const submitBtn = document.getElementById('entryFormSubmitBtn');
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>' + (isEdit ? 'Updating...' : 'Creating...');
+                try {
+                    const res = await fetch(url, {
+                        method,
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + token
+                        },
+                        body: JSON.stringify(data)
+                    });
+                    if (res.ok) {
+                        hideEntryForm();
+                        fetchEntries();
+                    } else {
+                        let errMsg = 'Failed to save entry';
+                        try {
+                            const err = await res.json();
+                            errMsg = err.error || errMsg;
+                        } catch {}
+                        // Show error inline
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = isEdit ? 'Update' : 'Create';
+                        let errorDiv = document.getElementById('entryFormError');
+                        if (!errorDiv) {
+                            errorDiv = document.createElement('div');
+                            errorDiv.id = 'entryFormError';
+                            errorDiv.className = 'alert alert-danger mt-3';
+                            form.appendChild(errorDiv);
+                        }
+                        errorDiv.innerText = errMsg;
+                    }
+                } finally {
+                    hideLoadingSpinner();
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = isEdit ? 'Update' : 'Create';
+                }
+            };
+        }
+
+        function hideEntryForm() {
+            document.getElementById('entryFormContainer').style.display = 'none';
+            document.getElementById('entryFormContainer').innerHTML = '';
+            document.body.style.overflow = '';
+            document.onkeydown = null;
+        }
+
+        // Add password show/hide for entry form
+        function toggleEntryFormPassword() {
+            const input = document.getElementById('entryPasswordInput');
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+
+        async function editEntry(id) {
+            showLoadingSpinner();
+            const res = await fetch('/psm/api/entry/' + id, {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            if (res.ok) {
+                const entry = await res.json();
+                showEntryForm(entry);
+            } else {
+                alert('Failed to load entry');
+            }
+            hideLoadingSpinner();
+        }
+
+        async function deleteEntry(id) {
+            if (!confirm('Delete this entry?')) return;
+            showLoadingSpinner();
+            const res = await fetch('/psm/api/entry/' + id, {
+                method: 'DELETE',
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            if (res.ok) {
+                fetchEntries();
+            } else {
+                alert('Failed to delete entry');
+            }
+            hideLoadingSpinner();
+        }
+
+        // Add searchEntries function for filtering
+        function searchEntries() {
+            // Prevent infinite rerender loop by only filtering, not rerendering the search bar
+            const searchValue = document.getElementById('entriesSearchInput').value;
+            window.entriesSearchValue = searchValue; // Save globally
+            const allEntries = window.allEntries || [];
+            let filtered;
+            if (!searchValue) {
+                filtered = allEntries;
+            } else {
+                filtered = allEntries.filter(entry => {
+                    return (
+                        (entry.module && entry.module.toLowerCase().includes(searchValue.toLowerCase())) ||
+                        (entry.ip && entry.ip.toLowerCase().includes(searchValue.toLowerCase())) ||
+                        (entry.port && String(entry.port).toLowerCase().includes(searchValue.toLowerCase())) ||
+                        (entry.url && entry.url.toLowerCase().includes(searchValue.toLowerCase())) ||
+                        (entry.created_by && entry.created_by.toLowerCase().includes(searchValue.toLowerCase()))
+                    );
+                });
+            }
+            // Only rerender table body and pagination, not the search bar
+            updateEntriesTableBody(filtered);
+        }
+
+        function updateEntriesTableBody(entries) {
+            const isAdmin = payload.role === 'admin';
+            let pageSize = window.entriesPageSize || 10;
+            if (![10, 20, 30, 40, 50].includes(pageSize)) pageSize = 10;
+            window.entriesPageSize = pageSize;
+            let currentPage = window.entriesCurrentPage || 1;
+            const totalPages = Math.ceil(entries.length / pageSize) || 1;
+            if (currentPage > totalPages) currentPage = totalPages;
+            window.entriesCurrentPage = currentPage;
+            const start = (currentPage - 1) * pageSize;
+            const end = start + pageSize;
+            const pagedEntries = entries.slice(start, end);
+            let tbody = '';
+            for (const entry of pagedEntries) {
+                tbody += `<tr>
+                    <td>${entry.module}</td>
+                    <td>${entry.ip || ''}</td>
+                    <td>${entry.port || ''}</td>
+                    <td>${entry.url || ''}</td>
+                    <td>${entry.username || ''}</td>
+                    <td><input type="password" value="${entry.password}" readonly style="border:none; background:transparent; width:90px;" id="pw${entry.id}"> <button class="btn btn-sm btn-outline-secondary" onclick="togglePassword(${entry.id})"><i class="bi bi-eye"></i></button></td>
+                    <td>${entry.note || ''}</td>`;
+                if (isAdmin) tbody += `<td>${entry.created_by || ''}</td>`;
+                tbody += `<td style="white-space:nowrap;">
+                    <span title="Edit">
+                        <i class="bi bi-pencil-square" style="color:#2596be; font-size:1.2em; cursor:pointer; vertical-align:middle;" onclick="editEntry(${entry.id})"></i>
+                    </span>
+                    <span title="Delete" class="ms-3">
+                        <i class="bi bi-trash" style="color:#dc3545; font-size:1.2em; cursor:pointer; vertical-align:middle;" onclick="deleteEntry(${entry.id})"></i>
+                    </span>
+                </td>
+                </tr>`;
+            }
+            document.querySelector('#entriesTableContainer tbody').innerHTML = tbody;
+            // Optionally update pagination if needed
+        }
+
+        fetchEntries();
+    </script>
+</body>
+</html>

@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="/psm/static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/psm/static/icons/bootstrap-icons.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+        .admin-container {
+            max-width: 1500px;
+            width: 98%;
+            margin: 20px auto;
+            padding: 2.5rem 2.5rem 2.5rem 2.5rem;
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 8px 32px 0 rgba(37, 150, 190, 0.10);
+            border: 1.5px solid #e3eaf1;
+        }
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .admin-header h3 {
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: #2596be;
+            margin-bottom: 0;
+        }
+        .dashboard-btn, .logout-btn {
+            background-color: #2596be;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            padding: 0.5rem 1.2rem;
+            margin-left: 0.5rem;
+            transition: box-shadow 0.2s, transform 0.2s;
+            box-shadow: 0 2px 8px 0 rgba(37,150,190,0.10);
+        }
+        .dashboard-btn:hover, .logout-btn:hover {
+            background-color: #2286aa;
+            box-shadow: 0 4px 16px 0 rgba(37,150,190,0.18);
+            transform: translateY(-2px) scale(1.04);
+        }
+        .form-label {
+            color: #2596be;
+            font-weight: 500;
+        }
+        .form-control, .form-select, textarea {
+            border-radius: 12px;
+            border: 1px solid #ced4da;
+            background: #f8f9fa;
+            color: #222;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .form-control:focus, .form-select:focus, textarea:focus {
+            border-color: #2596be;
+            box-shadow: 0 0 0 0.2rem rgba(37,150,190,0.10);
+            background: #fff;
+            color: #222;
+        }
+        input[type="password"], input[type="text"] {
+            color: #222 !important;
+            background: transparent;
+        }
+        .btn-primary, .btn-warning, .btn-danger, .btn-success {
+            border-radius: 8px;
+            font-weight: 600;
+            transition: box-shadow 0.2s, transform 0.2s;
+        }
+        .btn-primary, .btn-success {
+            background-color: #2596be;
+            border: none;
+        }
+        .btn-primary:hover, .btn-success:hover {
+            background-color: #2286aa;
+            box-shadow: 0 4px 16px 0 rgba(37,150,190,0.18);
+            transform: translateY(-2px) scale(1.04);
+        }
+        .btn-warning {
+            background-color: #ffc107;
+            color: #222;
+            border: none;
+        }
+        .btn-warning:hover {
+            background-color: #e0a800;
+            color: #222;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+            color: #fff;
+            border: none;
+        }
+        .btn-danger:hover {
+            background-color: #c32232;
+            color: #fff;
+        }
+        .table {
+            width: 100%;
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 0;
+        }
+        .table th, .table td {
+            border-color: #e3eaf1 !important;
+            vertical-align: middle;
+            text-align: center;
+        }
+        .table th {
+            background: #2596be;
+            color: #fff;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        .my-3 {
+            margin-top: 1.5rem !important;
+            margin-bottom: 1.5rem !important;
+        }
+        #adminError {
+            color: #dc3545;
+            font-weight: 500;
+            text-align: center;
+        }
+        @media (max-width: 900px) {
+            .admin-container { padding: 1.2rem 0.5rem; }
+            .table { font-size: 0.95rem; }
+        }
+        @media (max-width: 600px) {
+            .admin-container { padding: 0.5rem 0.2rem; }
+            .table { font-size: 0.85rem; }
+            .admin-header h3 { font-size: 1.2rem; }
+        }
+        .navbar-sticky {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            z-index: 1000;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .body-with-navbar {
+            padding-top: 70px; /* Adjust to navbar height */
+        }
+        .navbar-sticky {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            z-index: 1000;
+            background: #fff;
+            border-bottom: 1px solid #e0e0e0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            height: 70px;
+            display: flex;
+            align-items: center;
+        }
+        .navbar-content {
+            width: 98%;
+            max-width: 1500px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 70px;
+            padding-right: 24px; /* Add this line */
+        }
+        .navbar-heading {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2596be;
+        }
+        .navbar-right .btn {
+            margin-left: 10px;
+        }
+        /* .body-with-navbar {
+            padding-top: 70px;
+        } */
+        .table-active { background-color: #eaf6fb !important; }
+        .disabled-action { pointer-events: none; opacity: 0.5; }
+        .switch { position: relative; display: inline-block; width: 40px; height: 22px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 22px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: #28a745; }
+        input:checked + .slider:before { transform: translateX(18px); }
+        .switch input:disabled + .slider { background-color: #e0e0e0; opacity: 0.6; cursor: not-allowed; }
+        .switch input:disabled + .slider:before { background-color: #f5f5f5; }
+        .switch input:disabled + .slider { box-shadow: 0 0 0 2px #bbb inset; }
+        .switch input:disabled { cursor: not-allowed; }
+        /*
+         * --- Module Access Management Switch Styling ---
+         * Ensure checked (on) switches are always green, even when disabled.
+         */
+        .switch input:checked + .slider {
+            background-color: #28a745 !important; /* Always green when checked */
+            opacity: 1 !important; /* Do not fade out the green */
+        }
+        .switch input:disabled + .slider {
+            /* Only gray if unchecked; if checked, keep green */
+            background-color: #e0e0e0;
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .switch input:checked:disabled + .slider {
+            background-color: #28a745 !important;
+            opacity: 0.85;
+            box-shadow: 0 0 0 2px #28a74555 inset;
+        }
+        .switch input:checked + .slider:before {
+            transform: translateX(18px);
+        }
+        .switch input:disabled + .slider:before {
+            background-color: #f5f5f5;
+        }
+        .switch input:checked:disabled + .slider:before {
+            background-color: #fff;
+        }
+        .switch input + .slider {
+            cursor: pointer;
+            box-shadow: 0 1px 4px 0 rgba(40,167,69,0.08);
+            filter: none;
+            opacity: 1;
+            transition: box-shadow 0.2s, filter 0.2s, opacity 0.2s;
+        }
+        .switch input:disabled + .slider {
+            background-color: #e0e0e0;
+            opacity: 0.45;
+            cursor: not-allowed;
+            filter: grayscale(0.7) brightness(1.08);
+            box-shadow: none;
+        }
+        .switch input:checked:disabled + .slider {
+            background-color: #28a745 !important;
+            opacity: 0.55;
+            box-shadow: 0 0 0 2px #28a74555 inset;
+            filter: grayscale(0.5) brightness(1.08);
+        }
+        /* Make the module search input placeholder text white */
+        #maModuleSearch::placeholder {
+            color: #fff !important;
+            opacity: 1;
+        }
+        #maModuleSearch::-webkit-input-placeholder { color: #fff !important; }
+        #maModuleSearch::-moz-placeholder { color: #fff !important; }
+        #maModuleSearch:-ms-input-placeholder { color: #fff !important; }
+        #maModuleSearch::-ms-input-placeholder { color: #fff !important; }
+        #maModuleSearch { color: #fff !important; }
+        .navbar-text-btn {
+            cursor: pointer;
+            margin-left: 10px;
+            color: #2596be;
+            font-weight: 500;
+            transition: color 0.2s;
+            font-weight: bold;
+        }
+        .navbar-text-btn:hover {
+            color: #2286aa !important; /* Darker blue on hover */
+        }
+        .navbar-text-btn.active {
+            color: #888 !important; /* Grey for active */
+            pointer-events: none;
+        }
+        .navbar-right .navbar-text-btn:last-child {
+            margin-right: 8px; /* Add some space from the edge */
+        }
+        .admin-container,
+        #userMgmtSection,
+        #moduleAccessSection {
+            transition: opacity 0.35s cubic-bezier(0.4,0,0.2,1), visibility 0.35s cubic-bezier(0.4,0,0.2,1);
+        }
+        .hidden-section {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            display: none;
+        }
+        .visible-section {
+            opacity: 1;
+            visibility: visible;
+            display: block;
+        }
+        #loadingSpinner {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(255,255,255,0.6);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        /* Remove hover effect from the Edit button in Module Access Control */
+        #maEditBtn:hover, #maEditBtn:focus {
+            background-color: #2286aa !important;
+            color: #fff !important;
+            box-shadow: none !important;
+            filter: none !important;
+            outline: none !important;
+            border: none !important;
+            /* Remove any transform or scale */
+            transform: none !important;
+        }
+        #maEditBtn {
+            transition: none !important;
+            filter: none !important;
+            box-shadow: none !important;
+        }
+        /* Fix the size and alignment of Edit and Save buttons in Module Access Control */
+        #maEditBtn, #maSaveBtn {
+            min-width: 90px;
+            max-width: 90px;
+            min-height: 38px;
+            max-height: 38px;
+            font-size: 1rem;
+            padding: 0.375rem 0.5rem;
+            border-radius: 8px;
+            box-sizing: border-box;
+            width: 110px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            vertical-align: middle;
+        }
+        #maSaveBtn {
+            margin-left: 12px !important;
+        }
+        /* Remove hover and focus effect from the Save button in Module Access Control */
+        #maSaveBtn:hover, #maSaveBtn:focus {
+            background-color: #2286aa !important; /* Keep the normal green, no blue on hover */
+            color: #fff !important;
+            box-shadow: none !important;
+            filter: none !important;
+            outline: none !important;
+            border: none !important;
+            transform: none !important;
+        }
+        .navbar-text-btn.navbar-logout-text-btn:hover {
+            color: #c32232 !important;
+        }
+    </style>
+</head>
+<body class="body-with-navbar">
+    <nav class="navbar-sticky">
+        <div class="navbar-content">
+            <div class="navbar-left">
+                <span class="navbar-heading">Admin Panel</span>
+            </div>
+            <div class="navbar-right">
+    <span class="navbar-text-btn" id="navDashboardBtn" onclick="goDashboard()">Dashboard</span>
+    <span class="navbar-text-btn" id="navUserMgmtBtn" onclick="showUserMgmtSection()">User Management</span>
+    <span class="navbar-text-btn" id="navModuleAccessBtn" onclick="showModuleAccessSection()">Module Access Control</span>
+    <span class="navbar-text-btn navbar-logout-text-btn" style="color:#dc3545;" onclick="logout()">Logout</span>
+</div>
+    </nav>
+    <div class="admin-container">
+        <div id="userMgmtSection" class="card mb-5 visible-section" style="border-radius:16px;box-shadow:0 2px 12px 0 rgba(37,150,190,0.07);border:1px solid #e3eaf1;">
+            <div class="card-body">
+                <h4 style="color:#2596be;">User Management</h4>
+                <div id="usersTableContainer"></div>
+                <div id="userFormContainer" style="display:none;"></div>
+            </div>
+        </div>
+        <div id="moduleAccessSection" class="card hidden-section" style="border-radius:16px;box-shadow:0 2px 12px 0 rgba(37,150,190,0.07);border:1px solid #e3eaf1;">
+            <div class="card-body">
+                <h4 class="mt-0" style="color:#2596be;">Module Access Control</h4>
+                <div id="moduleAccessManager">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="maUserSelect" class="form-label">Select User</label>
+                            <select id="maUserSelect" class="form-select" style="max-width: 180px; min-width: 120px; width: 100%;"></select>
+                        </div>
+                        <div class="col-md-8 d-flex ms-auto justify-content-end align-items-end">
+                            <div id="maButtonGroup">
+                                <button id="maEditBtn" class="btn btn-primary">Edit</button>
+                                <button id="maSaveBtn" class="btn btn-success ms-2" style="display:none;">Save</button>
+                            </div>
+                        </div>
+                    </div>
+                    <table class="table table-bordered" id="maAccessTable">
+                        <thead>
+                            <tr>
+                                <th style="position:relative; text-align:left; min-width:220px;">
+                                    <div style="display:flex; align-items:center; justify-content:center; position:relative; width:100%; min-height:38px;">
+                                        <div style="position:absolute; left:0; top:0; bottom:0; display:flex; align-items:center; height:100%;">
+                                            <span style="display:flex; align-items:center;">
+                                                <i class="bi bi-search" style="color:#fff; font-size:1.1em; margin-right:7px;"></i>
+                                                <input type="text" id="maModuleSearch" class="form-control form-control-sm" placeholder="Search..."
+                                                    style="background:transparent; border:none; border-bottom:1px solid #fff; border-radius:0; color:#fff; padding-left:0; padding-right:0; height:32px; min-width:140px; max-width:180px; font-weight:500; font-size:1rem; outline:none; box-shadow:none; transition:border-color 0.2s;" />
+                                            </span>
+                                        </div>
+                                        <span style="margin:0 auto; position:relative; z-index:1; color:#fff; font-weight:600; letter-spacing:0.5px;">Module</span>
+                                    </div>
+                                </th>
+                                <th>Access</th>
+                            </tr>
+                        </thead>
+                        <tbody id="maAccessTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div id="adminError" class="text-danger mt-3"></div>
+    </div>
+    <div id="loadingSpinner" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(255,255,255,0.6);z-index:2000;align-items:center;justify-content:center;">
+        <div class="spinner-border" style="width:3rem;height:3rem;color:#2596be;" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+    <script src="/psm/static/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function logout() {
+            sessionStorage.removeItem('token');
+            sessionStorage.removeItem('adminLastSection');
+            window.location.href = '/psm';
+        }
+
+        const token = sessionStorage.getItem('token');
+        if (!token) window.location.href = '/psm';
+
+        function goDashboard() {
+            setActiveNavBtn('navDashboardBtn');
+            window.location.href = '/psm/dashboard';
+        }
+
+        let usersList = [];
+        let moduleAccessList = [];
+
+        async function fetchUsers() {
+            const res = await fetch('/psm/admin/users', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            if (res.ok) {
+                usersList = await res.json();
+                renderUsersTable(usersList);
+                await fetchCredentialsList();
+                // fetchModulesList(); // Removed old access form fetch
+                // fetchModuleAccessList(); // Removed old access list fetch
+            } else {
+                document.getElementById('adminError').innerText = 'Failed to load users.';
+            }
+        }
+
+        // Track edit mode for the table
+        let tableEditMode = false;
+
+        // Helper to get user role by username
+        function getUserRole(username) {
+            const user = usersList.find(u => u.username === username);
+            return user ? user.role : '';
+        }
+
+        function renderUsersTable(users) {
+            let html = `<div class="d-flex justify-content-end mb-2 gap-2">
+                <button class="btn btn-primary" onclick="showUserForm()">Add User</button>
+            </div>`;
+            html += `<table class="table table-bordered"><thead><tr><th>Username</th><th>Role</th><th>Actions</th></tr></thead><tbody>`;
+            for (const user of users) {
+                const safeUsername = encodeURIComponent(user.username);
+                const displayRole = user.role.charAt(0).toUpperCase() + user.role.slice(1);
+                html += `<tr id="userRow-${safeUsername}">
+                    <td>${user.username}</td>
+                    <td id="roleCell-${safeUsername}">${displayRole}</td>
+                    <td id="userActionsCell-${safeUsername}">
+                        <span class="action-icon me-2" id="roleIcon-${safeUsername}" title="Change Role" style="cursor:pointer;color:#ffc107;">
+                            <i class="bi bi-person-gear"></i>
+                        </span>
+                        <span class="action-icon me-2" id="pwIcon-${safeUsername}" title="Change Password" style="cursor:pointer;color:#2596be;"><i class="bi bi-key"></i></span>
+                        <span class="action-icon" id="delIcon-${safeUsername}" title="Delete User" style="cursor:pointer;color:#dc3545;"><i class="bi bi-trash"></i></span>
+                    </td>
+                </tr>`;
+            }
+            html += '</tbody></table>';
+            document.getElementById('usersTableContainer').innerHTML = html;
+            // Attach event listeners after rendering
+            for (const user of users) {
+                const safeUsername = encodeURIComponent(user.username);
+                // Change Role
+                document.getElementById(`roleIcon-${safeUsername}`).onclick = function() {
+                    showInlineRoleForm(user.username, user.role);
+                };
+                // Change Password
+                document.getElementById(`pwIcon-${safeUsername}`).onclick = function() {
+                    showChangePasswordForm(user.username);
+                };
+                // Delete
+                document.getElementById(`delIcon-${safeUsername}`).onclick = function() {
+                    deleteUser(user.username);
+                };
+            }
+        }
+
+        // Inline role change in table
+        function showInlineRoleForm(username, currentRole) {
+            const safeUsername = encodeURIComponent(username);
+            const cell = document.getElementById(`roleCell-${safeUsername}`);
+            if (!cell) return;
+            // Center the select box in the Role column
+            cell.innerHTML = `
+                <div style="display:flex;justify-content:center;align-items:center;height:100%;">
+                    <select class="form-select form-select-sm w-auto" id="inlineRoleSelect-${safeUsername}">
+                        <option value="user" ${currentRole==='user'?'selected':''}>User</option>
+                        <option value="admin" ${currentRole==='admin'?'selected':''}>Admin</option>
+                    </select>
+                </div>
+            `;
+            // Replace actions cell with Save/Cancel icons only
+            const actionsCell = document.getElementById(`userActionsCell-${safeUsername}`);
+            actionsCell.innerHTML = `
+                <span class="action-icon me-2" id="saveRoleBtn-${safeUsername}" title="Save" style="cursor:pointer;color:#28a745;font-size:1.3em;">
+                    <i class="bi bi-check-circle-fill"></i>
+                </span>
+                <span class="action-icon" id="cancelRoleBtn-${safeUsername}" title="Cancel" style="cursor:pointer;color:#6c757d;font-size:1.3em;">
+                    <i class="bi bi-x-circle-fill"></i>
+                </span>
+            `;
+            document.getElementById(`saveRoleBtn-${safeUsername}`).onclick = async function() {
+                const newRole = document.getElementById(`inlineRoleSelect-${safeUsername}`).value;
+                const data = { username, role: newRole };
+                const res = await fetch('/psm/admin/change_role', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify(data)
+                });
+                if (res.ok) {
+                    fetchUsers();
+                } else {
+                    const err = await res.json();
+                    alert(err.error || 'Failed to change role');
+                    cancelInlineRoleForm(username, currentRole);
+                }
+            };
+            document.getElementById(`cancelRoleBtn-${safeUsername}`).onclick = function() {
+                cancelInlineRoleForm(username, currentRole.charAt(0).toUpperCase() + currentRole.slice(1));
+            };
+        }
+        function cancelInlineRoleForm(username, currentRole) {
+            const safeUsername = encodeURIComponent(username);
+            const cell = document.getElementById(`roleCell-${safeUsername}`);
+            if (cell) cell.textContent = currentRole;
+            // Restore actions cell
+            const actionsCell = document.getElementById(`userActionsCell-${safeUsername}`);
+            if (actionsCell) {
+                actionsCell.innerHTML = `
+                    <span class="action-icon me-2" id="roleIcon-${safeUsername}" title="Change Role" style="cursor:pointer;color:#ffc107;">
+                        <i class="bi bi-person-gear"></i>
+                    </span>
+                    <span class="action-icon me-2" id="pwIcon-${safeUsername}" title="Change Password" style="cursor:pointer;color:#2596be;"><i class="bi bi-key"></i></span>
+                    <span class="action-icon" id="delIcon-${safeUsername}" title="Delete User" style="cursor:pointer;color:#dc3545;"><i class="bi bi-trash"></i></span>
+                `;
+                // Re-attach event listeners
+                document.getElementById(`roleIcon-${safeUsername}`).onclick = function() {
+                    showInlineRoleForm(username, currentRole);
+                };
+                document.getElementById(`pwIcon-${safeUsername}`).onclick = function() {
+                    showChangePasswordForm(username);
+                };
+                document.getElementById(`delIcon-${safeUsername}`).onclick = function() {
+                    deleteUser(username);
+                };
+            }
+        }
+
+        // Add User Modal HTML
+        function renderAddUserModal() {
+            if (document.getElementById('addUserModal')) return; // Prevent duplicates
+            const modalHtml = `
+            <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="addUserModalLabel">Add User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    <form id="userForm">
+                      <div class="mb-3">
+                        <label class="form-label">Username</label>
+                        <input class="form-control" name="username" placeholder="Username" required>
+                      </div>
+                      <div class="mb-3 position-relative">
+                        <label class="form-label">Password</label>
+                        <div class="input-group">
+                          <input class="form-control" name="password" placeholder="Password" required type="password" id="addUserPassword">
+                          <button class="btn btn-outline-secondary" type="button" tabindex="-1" id="toggleAddUserPassword" style="border-top-left-radius:0;border-bottom-left-radius:0;">
+                            <i class="bi bi-eye" id="addUserPasswordEye"></i>
+                          </button>
+                        </div>
+                      </div>
+                      <div class="mb-3 position-relative">
+                        <label class="form-label">Re-enter Password</label>
+                        <div class="input-group">
+                          <input class="form-control" name="password2" placeholder="Re-enter Password" required type="password" id="addUserPassword2">
+                          <button class="btn btn-outline-secondary" type="button" tabindex="-1" id="toggleAddUserPassword2" style="border-top-left-radius:0;border-bottom-left-radius:0;">
+                            <i class="bi bi-eye" id="addUserPassword2Eye"></i>
+                          </button>
+                        </div>
+                      </div>
+                      <div class="mb-3">
+                        <label class="form-label">Role</label>
+                        <select class="form-select" name="role">
+                          <option value="user">User</option>
+                          <option value="admin">Admin</option>
+                        </select>
+                      </div>
+                      <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-success">Create</button>
+                        <button type="button" class="btn btn-secondary ms-2" data-bs-dismiss="modal">Cancel</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>`;
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            // Eye toggle for password
+            document.getElementById('toggleAddUserPassword').onclick = function() {
+                const pwInput = document.getElementById('addUserPassword');
+                const eyeIcon = document.getElementById('addUserPasswordEye');
+                if (pwInput.type === 'password') {
+                    pwInput.type = 'text';
+                    eyeIcon.classList.remove('bi-eye');
+                    eyeIcon.classList.add('bi-eye-slash');
+                } else {
+                    pwInput.type = 'password';
+                    eyeIcon.classList.remove('bi-eye-slash');
+                    eyeIcon.classList.add('bi-eye');
+                }
+            };
+            document.getElementById('toggleAddUserPassword2').onclick = function() {
+                const pwInput = document.getElementById('addUserPassword2');
+                const eyeIcon = document.getElementById('addUserPassword2Eye');
+                if (pwInput.type === 'password') {
+                    pwInput.type = 'text';
+                    eyeIcon.classList.remove('bi-eye');
+                    eyeIcon.classList.add('bi-eye-slash');
+                } else {
+                    pwInput.type = 'password';
+                    eyeIcon.classList.remove('bi-eye-slash');
+                    eyeIcon.classList.add('bi-eye');
+                }
+            };
+            document.getElementById('userForm').onsubmit = async function(e) {
+                e.preventDefault();
+                const form = e.target;
+                const data = Object.fromEntries(new FormData(form));
+                // Password match validation
+                if (data.password !== data.password2) {
+                    alert('Passwords do not match.');
+                    document.getElementById('addUserPassword2').focus();
+                    return;
+                }
+                // Remove password2 before sending
+                delete data.password2;
+                const res = await fetch('/psm/admin/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify(data)
+                });
+                if (res.ok) {
+                    bootstrap.Modal.getInstance(document.getElementById('addUserModal')).hide();
+                    fetchUsers();
+                    // Reset form after success
+                    setTimeout(() => {
+                        form.reset();
+                        // Reset password fields to type password and eye icons
+                        document.getElementById('addUserPassword').type = 'password';
+                        document.getElementById('addUserPasswordEye').classList.remove('bi-eye-slash');
+                        document.getElementById('addUserPasswordEye').classList.add('bi-eye');
+                        document.getElementById('addUserPassword2').type = 'password';
+                        document.getElementById('addUserPassword2Eye').classList.remove('bi-eye-slash');
+                        document.getElementById('addUserPassword2Eye').classList.add('bi-eye');
+                    }, 300);
+                } else {
+                    const err = await res.json();
+                    alert(err.error || 'Failed to create user');
+                }
+            };
+        }
+
+        // Show Add User Modal
+        function showUserForm() {
+            renderAddUserModal();
+            const modal = new bootstrap.Modal(document.getElementById('addUserModal'));
+            modal.show();
+        }
+
+        // Remove old inline form container
+        function hideUserForm() {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('addUserModal'));
+            if (modal) modal.hide();
+        }
+
+        function showRoleForm(username, currentRole) {
+            const html = `
+                <form id="roleForm" class="mt-2">
+                    <input type="hidden" name="username" value="${username}">
+                    <select class="form-select d-inline w-auto" name="role">
+                        <option value="user" ${currentRole==='user'?'selected':''}>User</option>
+                        <option value="admin" ${currentRole==='admin'?'selected':''}>Admin</option>
+                    </select>
+                    <button type="submit" class="btn btn-success ms-2">Change</button>
+                    <button type="button" class="btn btn-secondary ms-2" onclick="hideRoleForm()">Cancel</button>
+                </form>
+            `;
+            document.getElementById('usersTableContainer').insertAdjacentHTML('beforebegin', html);
+            document.getElementById('roleForm').onsubmit = async function(e) {
+                e.preventDefault();
+                const form = e.target;
+                const data = Object.fromEntries(new FormData(form));
+                const res = await fetch('/psm/admin/change_role', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify(data)
+                });
+                if (res.ok) {
+                    hideRoleForm();
+                    fetchUsers();
+                } else {
+                    const err = await res.json();
+                    alert(err.error || 'Failed to change role');
+                }
+            };
+        }
+        function hideRoleForm() {
+            const form = document.getElementById('roleForm');
+            if (form) form.remove();
+        }
+
+        // Show inline change password form for a user
+        function showChangePasswordForm(username) {
+            hideChangePasswordForm(); // Remove any existing form
+            // Remove any previous change password form row
+            const oldFormRow = document.getElementById('changePasswordFormRow');
+            if (oldFormRow) oldFormRow.remove();
+            // Find the correct row by username
+            const safeUsername = encodeURIComponent(username);
+            const row = document.getElementById(`userRow-${safeUsername}`);
+            if (!row) return;
+            const formRow = document.createElement('tr');
+            formRow.id = 'changePasswordFormRow';
+            formRow.innerHTML = `<td colspan='3'>
+                <form id='changePasswordForm' class='d-flex align-items-center gap-2'>
+                    <input type='hidden' name='username' value='${username}'>
+                    <input type='password' class='form-control' name='password' placeholder='New Password' required style='max-width:220px;'>
+                    <button type='submit' class='btn btn-success btn-sm'>Update</button>
+                    <button type='button' class='btn btn-secondary btn-sm' onclick='hideChangePasswordForm()'>Cancel</button>
+                </form>
+            </td>`;
+            row.parentNode.insertBefore(formRow, row.nextSibling);
+            document.getElementById('changePasswordForm').onsubmit = async function(e) {
+                e.preventDefault();
+                const form = e.target;
+                const data = Object.fromEntries(new FormData(form));
+                const res = await fetch('/psm/admin/change_password', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify(data)
+                });
+                if (res.ok) {
+                    alert('Password updated successfully');
+                    hideChangePasswordForm();
+                } else {
+                    const err = await res.json();
+                    alert(err.error || 'Failed to update password');
+                }
+            };
+        }
+        function hideChangePasswordForm() {
+            const formRow = document.getElementById('changePasswordFormRow');
+            if (formRow) formRow.remove();
+        }
+
+        async function deleteUser(username, silent = false) {
+            if (!silent && !confirm('Delete this user?')) return;
+            const res = await fetch('/psm/admin/delete_user', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                },
+                body: JSON.stringify({ username })
+            });
+            if (res.ok) {
+                if (!silent) fetchUsers();
+            } else {
+                const err = await res.json();
+                if (!silent) alert(err.error || 'Failed to delete user');
+            }
+        }
+
+        // Module Access Management
+        function renderAccessForm() {
+            // Only show non-admin users in dropdown
+            const userOptions = usersList.filter(u => u.role !== 'admin').map(u => `<option value="${u.id}">${u.username}</option>`).join('');
+            document.getElementById('accessFormContainer').innerHTML = `
+                <form id="accessForm" class="row g-2">
+                    <div class="col-md-4">
+                        <label for="userSelect" class="form-label">Select User</label>
+                        <select class="form-select" name="user_id" id="userSelect" required>
+                            <option value="">Select User</option>
+                            ${userOptions}
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="moduleSelect" class="form-label">Select Modules (multi-select)</label>
+                        <select class="form-select" name="modules" id="moduleSelect" multiple required></select>
+                        <div class="form-text">Hold Ctrl (Windows) or Cmd (Mac) to select multiple modules.</div>
+                        <div id="noModulesMsg" class="text-danger mt-1" style="display:none;"></div>
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end">
+                        <button type="submit" class="btn btn-success w-100">Grant Access</button>
+                    </div>
+                </form>
+            `;
+            // Initial population
+            updateModuleSelectForUser('');
+            // When user changes, update module options
+            document.getElementById('userSelect').addEventListener('change', function() {
+                const userId = String(this.value);
+                updateModuleSelectForUser(userId);
+            });
+            // Trigger initial module list update if a user is preselected
+            setTimeout(() => {
+                const userSelect = document.getElementById('userSelect');
+                if (userSelect && userSelect.value) {
+                    updateModuleSelectForUser(userSelect.value);
+                }
+            }, 100);
+            // Form submit handler for multiple modules
+            document.getElementById('accessForm').onsubmit = async function(e) {
+                e.preventDefault();
+                const user_id = document.getElementById('userSelect').value;
+                const moduleSelect = document.getElementById('moduleSelect');
+                const modules = Array.from(moduleSelect.selectedOptions).map(opt => opt.value);
+                if (!user_id || !modules || modules.length === 0) {
+                    alert('Please select a user and at least one module.');
+                    return;
+                }
+                let successCount = 0, failCount = 0, failMsgs = [];
+                for (const module of modules) {
+                    // Prevent granting access to non-admin modules (should not be possible, but double check)
+                    const moduleObj = maModules.find(m => (m.module || m.name || m) === module);
+                    if (!moduleObj || (moduleObj.created_by && moduleObj.created_by !== 'admin' && moduleObj.created_by !== 'admin1')) {
+                        failCount++;
+                        failMsgs.push('Cannot grant access to non-admin module: ' + module);
+                        continue;
+                    }
+                    const res = await fetch('/psm/admin/grant_access', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + token
+                        },
+                        body: JSON.stringify({ user_id, module })
+                    });
+                    if (res.ok) {
+                        successCount++;
+                    } else {
+                        failCount++;
+                        try {
+                            const err = await res.json();
+                            failMsgs.push(err.error || 'Failed to grant access to ' + module);
+                        } catch { failMsgs.push('Failed to grant access to ' + module); }
+                    }
+                }
+                if (successCount > 0) alert('Access granted for ' + successCount + ' module(s).');
+                if (failCount > 0) alert('Some failed: ' + failMsgs.join('\n'));
+                if (typeof afterModuleChange === 'function') afterModuleChange();
+            };
+        }
+
+        // Update revokeAccess to accept parameters
+        async function revokeAccess(user_id, module) {
+            // If called from the form, fallback to form values
+            if (!user_id || !module) {
+                const form = document.getElementById('accessForm');
+                if (!form) return;
+                user_id = form.user_id.value;
+                module = form.module.value;
+            }
+            if (!user_id || !module) {
+                alert('Please select both user and module to revoke access.');
+                return;
+            }
+            if (!confirm('Revoke access for this user to this module?')) return;
+            const res = await fetch('/psm/admin/revoke_access', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                },
+                body: JSON.stringify({ user_id, module })
+            });
+            if (res.ok) {
+                alert('Access revoked');
+                if (typeof afterModuleChange === 'function') afterModuleChange();
+            } else {
+                const err = await res.json();
+                alert(err.error || 'Failed to revoke access');
+            }
+        }
+
+        // Helper to update modules when user changes
+        window.onUserChange = function(userId) {
+            renderAccessForm();
+        };
+
+        async function fetchModuleAccessList() {
+            // Get all user_module_access rows and show username instead of user_id
+            const res = await fetch('/psm/api/user_module_access', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            if (res.ok) {
+                moduleAccessList = await res.json();
+                renderModuleAccessList();
+            } else {
+                document.getElementById('moduleAccessListContainer').innerText = 'Failed to load module access list.';
+            }
+        }
+        function renderModuleAccessList() {
+            if (!moduleAccessList.length) {
+                document.getElementById('moduleAccessListContainer').innerHTML = '<em>No module access records found.</em>';
+                return;
+            }
+            let html = `<table class="table table-bordered"><thead><tr><th>User</th><th>Module</th><th>Action</th></tr></thead><tbody>`;
+            for (const access of moduleAccessList) {
+                const user = usersList.find(u => u.id === access.user_id);
+                html += `<tr><td>${user ? user.username : access.user_id}</td><td>${access.module}</td><td><button class="btn btn-sm btn-danger" onclick="revokeAccess('${access.user_id}','${access.module}')">Revoke</button></td></tr>`;
+            }
+            html += '</tbody></table>';
+            document.getElementById('moduleAccessListContainer').innerHTML = html;
+        }
+
+        // Fetch credentials for ownership info
+        let credentialsList = [];
+        async function fetchCredentialsList() {
+            const res = await fetch('/psm/api/entries', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            if (res.ok) {
+                credentialsList = await res.json();
+            } else {
+                credentialsList = [];
+            }
+        }
+
+        function toggleUserPassword(safeUsername) {
+            const input = document.getElementById('pwuser' + safeUsername);
+            if (input) {
+                input.type = input.type === 'password' ? 'text' : 'password';
+            }
+        }
+
+        // Helper to get user role by username
+        function getUserRole(username) {
+            const user = usersList.find(u => u.username === username);
+            return user ? user.role : '';
+        }
+
+        fetchUsers();
+
+        // --- Module Access Management Table ---
+        let maUsers = [];
+        let maModules = [];
+        let maAccess = [];
+        let maSelectedUserId = null;
+        let maEditMode = false;
+        let maPendingAccess = {};
+        const maToken = sessionStorage.getItem('token');
+
+        function maFetchUsers() {
+            fetch('/psm/admin/users', {
+                headers: { 'Authorization': 'Bearer ' + maToken }
+            })
+            .then(res => res.json())
+            .then(data => {
+                // Only show users whose role is exactly 'user' (case-insensitive)
+                maUsers = data.filter(u => String(u.role).toLowerCase() === 'user');
+                const sel = document.getElementById('maUserSelect');
+                sel.innerHTML = maUsers.length ? maUsers.map(u => `<option value="${u.id}">${u.username}</option>`).join('') : '<option disabled selected>No users with role user</option>';
+                if (maUsers.length) {
+                    maSelectedUserId = maUsers[0].id;
+                    maFetchAll();
+                } else {
+                    maSelectedUserId = null;
+                    maRenderTable();
+                }
+            });
+        }
+        function maFetchModules() {
+            return fetch('/psm/api/modules', {
+                headers: { 'Authorization': 'Bearer ' + maToken }
+            })
+            .then(res => res.json())
+            .then(data => { maModules = data; });
+        }
+        function maFetchAccess() {
+            return fetch('/psm/api/user_module_access', {
+                headers: { 'Authorization': 'Bearer ' + maToken }
+            })
+            .then(res => res.json())
+            .then(data => { maAccess = data; });
+        }
+        function maRenderTable() {
+            const tbody = document.getElementById('maAccessTableBody');
+            if (!maSelectedUserId) { tbody.innerHTML = ''; return; }
+            // Search filter
+            const searchValue = (document.getElementById('maModuleSearch')?.value || '').toLowerCase();
+            // Always reflect real access state from maAccess (DB), only allow editing in edit mode
+            const accessSet = new Set(maAccess.filter(a => a.user_id == maSelectedUserId).map(a => a.module));
+            let pendingSet = null;
+            if (maEditMode && maPendingAccess[maSelectedUserId]) {
+                pendingSet = new Set(maPendingAccess[maSelectedUserId]);
+            }
+            // Only show modules created by admin (API now returns array of {module, created_by})
+            tbody.innerHTML = maModules
+                .filter(moduleObj => {
+                    const moduleName = moduleObj.module || moduleObj.name || moduleObj;
+                    return moduleName.toLowerCase().includes(searchValue);
+                })
+                .map(moduleObj => {
+                    const moduleName = moduleObj.module || moduleObj.name || moduleObj;
+                    let checked = false;
+                    if (maEditMode && pendingSet) {
+                        checked = pendingSet.has(moduleName);
+                    } else {
+                        checked = accessSet.has(moduleName);
+                    }
+                    return `<tr><td>${moduleName}</td><td><label class="switch"><input type="checkbox"${checked ? ' checked="checked"' : ''}${maEditMode ? '' : ' disabled'} onchange="maOnSwitchChange('${moduleName}', this.checked)"><span class="slider"></span></label></td></tr>`;
+                }).join('');
+        }
+        window.maOnSwitchChange = function(module, checked) {
+            if (!maEditMode) return;
+            if (!maPendingAccess[maSelectedUserId]) {
+                // Start with current access
+                maPendingAccess[maSelectedUserId] = maAccess.filter(a => a.user_id == maSelectedUserId).map(a => a.module);
+            }
+            let arr = maPendingAccess[maSelectedUserId];
+            if (checked) {
+                if (!arr.includes(module)) arr.push(module);
+            } else {
+                maPendingAccess[maSelectedUserId] = arr.filter(m => m !== module);
+            }
+        };
+        function maFetchAll() {
+            Promise.all([maFetchModules(), maFetchAccess()]).then(() => {
+                maPendingAccess = {}; // Reset pending changes
+                maEditMode = false;
+                maUpdateButtons();
+                maRenderTable();
+            });
+        }
+        document.getElementById('maUserSelect').addEventListener('change', function() {
+            maSelectedUserId = this.value;
+            maFetchAccess().then(() => {
+                maPendingAccess = {}; // Reset pending changes
+                maEditMode = false;
+                maUpdateButtons();
+                maRenderTable();
+            });
+        });
+        // Button logic
+        function maUpdateButtons() {
+            document.getElementById('maEditBtn').style.display = maEditMode ? 'none' : '';
+            document.getElementById('maSaveBtn').style.display = maEditMode ? '' : 'none';
+        }
+        document.getElementById('maEditBtn').onclick = function() {
+            maEditMode = true;
+            // Start with current access for this user
+            maPendingAccess[maSelectedUserId] = maAccess.filter(a => a.user_id == maSelectedUserId).map(a => a.module);
+            maUpdateButtons();
+            maRenderTable();
+        };
+        document.getElementById('maSaveBtn').onclick = async function() {
+            if (!maEditMode) return;
+            const oldAccess = maAccess.filter(a => a.user_id == maSelectedUserId).map(a => a.module);
+            const newAccess = maPendingAccess[maSelectedUserId] || [];
+            // Find modules to grant and revoke
+            const toGrant = newAccess.filter(m => !oldAccess.includes(m));
+            const toRevoke = oldAccess.filter(m => !newAccess.includes(m));
+            // Grant access
+            for (const module of toGrant) {
+                await fetch('/psm/admin/grant_access', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + maToken
+                    },
+                    body: JSON.stringify({ user_id: maSelectedUserId, module })
+                });
+            }
+            // Revoke access
+            for (const module of toRevoke) {
+                await fetch('/psm/admin/revoke_access', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + maToken
+                    },
+                    body: JSON.stringify({ user_id: maSelectedUserId, module })
+                });
+            }
+            // Refresh
+            await maFetchAccess();
+            maEditMode = false;
+            maPendingAccess = {};
+            maUpdateButtons();
+            maRenderTable();
+        };
+        // Switch styling for toggle
+        const maStyle = document.createElement('style');
+        maStyle.innerHTML = `.switch { position: relative; display: inline-block; width: 40px; height: 22px; } .switch input { opacity: 0; width: 0; height: 0; } .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 22px; } .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; } input:checked + .slider { background-color: #28a745; } input:checked + .slider:before { transform: translateX(18px); } .switch input:disabled + .slider { background-color: #e0e0e0; opacity: 0.6; cursor: not-allowed; } .switch input:disabled + .slider:before { background-color: #f5f5f5; } .switch input:disabled + .slider { box-shadow: 0 0 0 2px #bbb inset; } .switch input:disabled { cursor: not-allowed; }`;
+        document.head.appendChild(maStyle);
+        maFetchUsers();
+        // Add search event listener after DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('maModuleSearch');
+            if (searchInput) {
+                searchInput.addEventListener('input', maRenderTable);
+            }
+        });
+        // --- End Module Access Management Table ---
+
+        function showLoadingSpinner() {
+            document.getElementById('loadingSpinner').style.display = 'flex';
+        }
+        function hideLoadingSpinner() {
+            document.getElementById('loadingSpinner').style.display = 'none';
+        }
+        function setActiveNavBtn(btnId) {
+            document.querySelectorAll('.navbar-text-btn').forEach(btn => btn.classList.remove('active'));
+            const btn = document.getElementById(btnId);
+            if (btn) btn.classList.add('active');
+        }
+        // Remember section on switch
+        function showUserMgmtSection() {
+            sessionStorage.setItem('adminLastSection', 'userMgmt');
+            setActiveNavBtn('navUserMgmtBtn');
+            showLoadingSpinner();
+            document.getElementById('userMgmtSection').classList.remove('hidden-section');
+            document.getElementById('userMgmtSection').classList.add('visible-section');
+            document.getElementById('moduleAccessSection').classList.remove('visible-section');
+            document.getElementById('moduleAccessSection').classList.add('hidden-section');
+            // Fetch users and hide spinner when done
+            fetchUsers().finally(() => {
+                hideLoadingSpinner();
+            });
+        }
+        function showModuleAccessSection() {
+            sessionStorage.setItem('adminLastSection', 'moduleAccess');
+            setActiveNavBtn('navModuleAccessBtn');
+            showLoadingSpinner();
+            document.getElementById('moduleAccessSection').classList.remove('hidden-section');
+            document.getElementById('moduleAccessSection').classList.add('visible-section');
+            document.getElementById('userMgmtSection').classList.remove('visible-section');
+            document.getElementById('userMgmtSection').classList.add('hidden-section');
+            // Fetch module access data and hide spinner when done
+            Promise.all([
+                maFetchModules(),
+                maFetchAccess(),
+                maFetchUsers()
+            ]).finally(() => {
+                hideLoadingSpinner();
+                maRenderTable();
+            });
+        }
+        // Set default section on load, and remember last section
+        // Only call the correct section function based on lastSection
+        // Prevent double-calling fetches and section switches
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const lastSection = sessionStorage.getItem('adminLastSection') || 'userMgmt';
+            showLoadingSpinner();
+            if (lastSection === 'moduleAccess') {
+                showModuleAccessSection();
+            } else {
+                showUserMgmtSection();
+            }
+        });
+    </script>
+</body>
+</html>
